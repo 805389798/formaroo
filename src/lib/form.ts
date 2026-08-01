@@ -48,10 +48,10 @@ export async function handleSubmission(
 ): Promise<SubmitResult> {
   const supabase = createAdminClient();
 
-  // 1. 查表单
+  // 1. 查表单(联查 owner 的订阅计划与用量)
   const { data: form, error: formErr } = await supabase
     .from("forms")
-    .select("id, name, redirect_url, webhook_url, honeypot_field, enabled, submissions_count, user_id")
+    .select("id, name, redirect_url, webhook_url, honeypot_field, enabled, submissions_count, user_id, profiles(plan, submissions_used, usage_month)")
     .eq("id", formId)
     .single();
 
@@ -61,6 +61,24 @@ export async function handleSubmission(
 
   if (!form.enabled) {
     return { ok: false, status: 403, message: "This form has been disabled" };
+  }
+
+  // 1.5 配额检查(按 owner 的订阅计划)
+  const owner = Array.isArray(form.profiles) ? form.profiles[0] : form.profiles;
+  const plan = (owner?.plan as string) || "free";
+  const quotas: Record<string, number> = { free: 100, pro: 10_000, scale: 100_000 };
+  const quota = quotas[plan] || quotas.free;
+
+  const usageMonth = owner?.usage_month || "";
+  const currentMonth = new Date().toISOString().slice(0, 7);
+  const used = usageMonth === currentMonth ? (owner?.submissions_used as number) || 0 : 0;
+
+  if (used >= quota) {
+    return {
+      ok: false,
+      status: 429,
+      message: "Submission limit reached for this month. Please upgrade your plan.",
+    };
   }
 
   // 2. 反垃圾:蜜罐字段(填了就是机器人)
@@ -99,11 +117,25 @@ export async function handleSubmission(
     return { ok: false, status: 500, message: "Internal server error" };
   }
 
-  // 6. 更新表单提交计数
+  // 6. 更新表单提交计数 + owner 月度用量(跨月自动重置)
   await supabase
     .from("forms")
     .update({ submissions_count: (form.submissions_count || 0) + 1 })
     .eq("id", formId);
+
+  const newUsed = used + 1;
+  if (usageMonth === currentMonth) {
+    await supabase
+      .from("profiles")
+      .update({ submissions_used: newUsed })
+      .eq("id", form.user_id);
+  } else {
+    // 新月份:重置计数
+    await supabase
+      .from("profiles")
+      .update({ submissions_used: 1, usage_month: currentMonth })
+      .eq("id", form.user_id);
+  }
 
   // 7. 触发 Webhook(异步,不阻塞响应)
   if (form.webhook_url) {
