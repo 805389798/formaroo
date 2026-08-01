@@ -72,7 +72,7 @@ export default function HomePage() {
               <span className="text-gray-500">&lt;form</span>{" "}
               <span className="text-emerald-400">action</span>
               <span className="text-gray-300">=</span>
-              <span className="text-amber-400">&quot;https://formaroo.com/f/YOUR_FORM_ID&quot;</span>{" "}
+              <span className="text-amber-400">&quot;https://formaroo.yearn05.com/f/YOUR_FORM_ID&quot;</span>{" "}
               <span className="text-emerald-400">method</span>
               <span className="text-gray-300">=</span>
               <span className="text-amber-400">&quot;POST&quot;</span>

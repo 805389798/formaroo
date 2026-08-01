@@ -3,7 +3,7 @@ import { handleSubmission } from "@/lib/form";
 
 /**
  * ⭐ Formaroo 核心端点:接收表单提交
- * 用法:<form action="https://formaroo.com/f/{formId}" method="POST">
+ * 用法:<form action="https://formaroo.yearn05.com/f/{formId}" method="POST">
  * 支持:application/x-www-form-urlencoded (HTML表单), application/json, multipart/form-data
  */
 export async function POST(

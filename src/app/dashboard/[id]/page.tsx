@@ -3,6 +3,7 @@
 import { useEffect, useState, useCallback } from "react";
 import { useParams, useRouter } from "next/navigation";
 import Link from "next/link";
+import { formEndpoint } from "@/lib/site";
 
 interface Form {
   id: string;
@@ -97,7 +98,7 @@ export default function FormDetailPage() {
   }
 
   async function copyEndpoint() {
-    const url = `https://formaroo.com/f/${id}`;
+    const url = formEndpoint(id);
     try {
       await navigator.clipboard.writeText(url);
       setCopied(true);
@@ -123,14 +124,14 @@ export default function FormDetailPage() {
     );
   }
 
-  const htmlSnippet = `<form action="https://formaroo.com/f/${id}" method="POST">
+  const htmlSnippet = `<form action="${formEndpoint(id)}" method="POST">
   <input type="text" name="name" placeholder="你的名字" required />
   <input type="email" name="email" placeholder="邮箱" required />
   <input type="text" name="company_website" style="display:none" />
   <button type="submit">提交</button>
 </form>`;
 
-  const jsSnippet = `await fetch("https://formaroo.com/f/${id}", {
+  const jsSnippet = `await fetch("${formEndpoint(id)}", {
   method: "POST",
   headers: { "Content-Type": "application/json" },
   body: JSON.stringify({ name: "Alice", email: "alice@example.com" }),
@@ -179,7 +180,7 @@ export default function FormDetailPage() {
             </button>
           </div>
           <p className="text-sm text-gray-500 mb-3">
-            端点地址:<code className="text-emerald-400 bg-gray-800 px-2 py-0.5 rounded font-mono">https://formaroo.com/f/{id}</code>
+            端点地址:<code className="text-emerald-400 bg-gray-800 px-2 py-0.5 rounded font-mono">{formEndpoint(id)}</code>
           </p>
           <div className="grid md:grid-cols-2 gap-4">
             <div>
