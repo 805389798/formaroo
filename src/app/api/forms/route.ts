@@ -6,7 +6,7 @@ import { generateFormId } from "@/lib/form";
  * 表单 API:创建/列表
  * 需要登录(通过 Supabase session)
  */
-export async function GET(request: NextRequest) {
+export async function GET() {
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) return Response.json({ error: "Unauthorized" }, { status: 401 });

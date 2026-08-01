@@ -57,17 +57,13 @@ export async function POST(request: NextRequest) {
     const customData = attributes.custom_data || {};
     let userId: string | null = customData.user_id || null;
 
-    let userRecord = null;
-    if (!userId) {
-      if (userEmail) {
-        const { data: profile } = await supabase
-          .from("profiles")
-          .select("id")
-          .eq("email", userEmail)
-          .maybeSingle();
-        userRecord = profile;
-        if (profile) userId = profile.id;
-      }
+    if (!userId && userEmail) {
+      const { data: profile } = await supabase
+        .from("profiles")
+        .select("id")
+        .eq("email", userEmail)
+        .maybeSingle();
+      if (profile) userId = profile.id;
     }
 
     if (!userId) {

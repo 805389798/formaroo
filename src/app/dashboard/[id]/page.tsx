@@ -54,6 +54,7 @@ export default function FormDetailPage() {
   }, [id, router]);
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- 异步数据加载,标准模式
     load();
   }, [load]);
 
