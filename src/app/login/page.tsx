@@ -1,4 +1,5 @@
 import LoginForm from "./login-form";
+import { getServerDictionary } from "@/lib/locale";
 
 /**
  * 登录/注册页
@@ -10,5 +11,11 @@ export default async function LoginPage({
   searchParams: Promise<{ mode?: string; error?: string; next?: string }>;
 }) {
   const params = await searchParams;
-  return <LoginForm initialMode={params.mode === "signup" ? "signup" : "login"} />;
+  const t = await getServerDictionary();
+  return (
+    <LoginForm
+      initialMode={params.mode === "signup" ? "signup" : "login"}
+      dict={t.auth}
+    />
+  );
 }

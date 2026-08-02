@@ -3,8 +3,32 @@
 import { useState } from "react";
 import { createClient } from "@/lib/supabase/client";
 import { useRouter } from "next/navigation";
+import LanguageSwitcher from "@/components/language-switcher";
 
-export default function LoginForm({ initialMode }: { initialMode: "login" | "signup" }) {
+interface AuthDict {
+  welcomeBack: string;
+  createAccount: string;
+  subtitle: string;
+  email: string;
+  password: string;
+  login: string;
+  signup: string;
+  processing: string;
+  noAccount: string;
+  haveAccount: string;
+  freeSignup: string;
+  goLogin: string;
+  successSignup: string;
+  passHint: string;
+}
+
+export default function LoginForm({
+  initialMode,
+  dict,
+}: {
+  initialMode: "login" | "signup";
+  dict: AuthDict;
+}) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [mode, setMode] = useState<"login" | "signup">(initialMode);
@@ -31,10 +55,7 @@ export default function LoginForm({ initialMode }: { initialMode: "login" | "sig
         if (data.session) {
           router.push("/dashboard");
         } else {
-          setMessage({
-            type: "info",
-            text: "注册成功!请查收邮件点击确认链接后登录。",
-          });
+          setMessage({ type: "info", text: dict.successSignup });
         }
       } else {
         const { error } = await supabase.auth.signInWithPassword({ email, password });
@@ -43,26 +64,29 @@ export default function LoginForm({ initialMode }: { initialMode: "login" | "sig
         router.refresh();
       }
     } catch (err) {
-      setMessage({ type: "error", text: err instanceof Error ? err.message : "操作失败" });
+      setMessage({ type: "error", text: err instanceof Error ? err.message : "Error" });
     } finally {
       setLoading(false);
     }
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-950 px-4">
+    <div className="min-h-screen flex items-center justify-center bg-gray-950 px-4 relative">
+      <div className="absolute top-4 right-4">
+        <LanguageSwitcher />
+      </div>
       <div className="w-full max-w-md">
         <div className="text-center mb-8">
           <h1 className="text-3xl font-bold text-white">
-            {mode === "login" ? "欢迎回来" : "创建账号"}
+            {mode === "login" ? dict.welcomeBack : dict.createAccount}
           </h1>
-          <p className="text-gray-400 mt-2">Formaroo · 表单后端,三行代码接入</p>
+          <p className="text-gray-400 mt-2">{dict.subtitle}</p>
         </div>
 
         <form onSubmit={handleSubmit} className="bg-gray-900 rounded-2xl p-8 shadow-xl border border-gray-800">
           <div className="space-y-4">
             <div>
-              <label className="block text-sm font-medium text-gray-300 mb-1">邮箱</label>
+              <label className="block text-sm font-medium text-gray-300 mb-1">{dict.email}</label>
               <input
                 type="email"
                 required
@@ -73,7 +97,7 @@ export default function LoginForm({ initialMode }: { initialMode: "login" | "sig
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-300 mb-1">密码</label>
+              <label className="block text-sm font-medium text-gray-300 mb-1">{dict.password}</label>
               <input
                 type="password"
                 required
@@ -81,7 +105,7 @@ export default function LoginForm({ initialMode }: { initialMode: "login" | "sig
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 className="w-full px-4 py-2.5 rounded-lg bg-gray-800 border border-gray-700 text-white focus:outline-none focus:ring-2 focus:ring-emerald-500"
-                placeholder="至少 6 位"
+                placeholder={dict.passHint}
               />
             </div>
 
@@ -102,7 +126,7 @@ export default function LoginForm({ initialMode }: { initialMode: "login" | "sig
               disabled={loading}
               className="w-full py-2.5 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white font-semibold transition disabled:opacity-50"
             >
-              {loading ? "处理中..." : mode === "login" ? "登录" : "注册"}
+              {loading ? dict.processing : mode === "login" ? dict.login : dict.signup}
             </button>
           </div>
         </form>
@@ -110,16 +134,16 @@ export default function LoginForm({ initialMode }: { initialMode: "login" | "sig
         <p className="text-center text-gray-500 mt-6 text-sm">
           {mode === "login" ? (
             <>
-              没有账号?{" "}
+              {dict.noAccount}{" "}
               <button onClick={() => setMode("signup")} className="text-emerald-400 hover:underline">
-                免费注册
+                {dict.freeSignup}
               </button>
             </>
           ) : (
             <>
-              已有账号?{" "}
+              {dict.haveAccount}{" "}
               <button onClick={() => setMode("login")} className="text-emerald-400 hover:underline">
-                去登录
+                {dict.goLogin}
               </button>
             </>
           )}
