@@ -75,6 +75,14 @@ export interface Dictionary {
     goLogin: string;
     successSignup: string;
     passHint: string;
+    otpTitle: string;
+    otpSubtitle: string;
+    otpSend: string;
+    otpVerify: string;
+    otpSent: string;
+    otpSwitch: string;
+    passwordSwitch: string;
+    otpPlaceholder: string;
   };
   dashboard: {
     loading: string;
@@ -245,6 +253,14 @@ export const dictionaries: Record<Locale, Dictionary> = {
       goLogin: "Log in",
       successSignup: "Success! Check your email to confirm your account, then log in.",
       passHint: "At least 6 characters",
+      otpTitle: "Email code login",
+      otpSubtitle: "We'll email you a 6-digit code. No password needed.",
+      otpSend: "Send code",
+      otpVerify: "Verify & log in",
+      otpSent: "Code sent! Check your email.",
+      otpSwitch: "Use email code instead",
+      passwordSwitch: "Use password instead",
+      otpPlaceholder: "6-digit code",
     },
     dashboard: {
       loading: "Loading...",
@@ -413,6 +429,14 @@ export const dictionaries: Record<Locale, Dictionary> = {
       goLogin: "去登录",
       successSignup: "注册成功!请查收邮件点击确认链接后登录。",
       passHint: "至少 6 位",
+      otpTitle: "邮箱验证码登录",
+      otpSubtitle: "我们会向您的邮箱发送 6 位验证码,无需密码。",
+      otpSend: "发送验证码",
+      otpVerify: "验证并登录",
+      otpSent: "验证码已发送!请查收邮件。",
+      otpSwitch: "改用邮箱验证码登录",
+      passwordSwitch: "改用密码登录",
+      otpPlaceholder: "6 位验证码",
     },
     dashboard: {
       loading: "加载中...",

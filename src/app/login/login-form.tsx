@@ -21,6 +21,14 @@ interface AuthDict {
   goLogin: string;
   successSignup: string;
   passHint: string;
+  otpTitle: string;
+  otpSubtitle: string;
+  otpSend: string;
+  otpVerify: string;
+  otpSent: string;
+  otpSwitch: string;
+  passwordSwitch: string;
+  otpPlaceholder: string;
 }
 
 export default function LoginForm({
@@ -33,6 +41,9 @@ export default function LoginForm({
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [mode, setMode] = useState<"login" | "signup">(initialMode);
+  const [authMethod, setAuthMethod] = useState<"password" | "otp">("password");
+  const [otpCode, setOtpCode] = useState("");
+  const [otpSent, setOtpSent] = useState(false);
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState<{ type: "error" | "info"; text: string } | null>(null);
   const router = useRouter();
@@ -69,6 +80,29 @@ export default function LoginForm({
         setLoading(false);
         // token 单次使用,失败后重置 widget 允许重试
         (window as unknown as { turnstile?: { reset: () => void } }).turnstile?.reset();
+        return;
+      }
+
+      // 邮箱验证码登录(OTP):第一步发码,第二步验证
+      if (authMethod === "otp" && mode === "login") {
+        if (!otpSent) {
+          const { error } = await supabase.auth.signInWithOtp({
+            email,
+            options: { emailRedirectTo: `${window.location.origin}/auth/callback?next=/dashboard` },
+          });
+          if (error) throw error;
+          setOtpSent(true);
+          setMessage({ type: "info", text: dict.otpSent });
+        } else {
+          const { error } = await supabase.auth.verifyOtp({
+            email,
+            token: otpCode,
+            type: "email",
+          });
+          if (error) throw error;
+          router.push("/dashboard");
+          router.refresh();
+        }
         return;
       }
 
@@ -131,18 +165,38 @@ export default function LoginForm({
                 placeholder="you@example.com"
               />
             </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-300 mb-1">{dict.password}</label>
-              <input
-                type="password"
-                required
-                minLength={6}
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                className="w-full px-4 py-2.5 rounded-lg bg-gray-800 border border-gray-700 text-white focus:outline-none focus:ring-2 focus:ring-emerald-500"
-                placeholder={dict.passHint}
-              />
-            </div>
+
+            {authMethod === "otp" && mode === "login" ? (
+              <div>
+                <label className="block text-sm font-medium text-gray-300 mb-1">{dict.otpTitle}</label>
+                <input
+                  type="text"
+                  required
+                  inputMode="numeric"
+                  pattern="[0-9]{6}"
+                  maxLength={6}
+                  value={otpCode}
+                  onChange={(e) => setOtpCode(e.target.value)}
+                  disabled={!otpSent}
+                  className="w-full px-4 py-2.5 rounded-lg bg-gray-800 border border-gray-700 text-white focus:outline-none focus:ring-2 focus:ring-emerald-500 disabled:opacity-50"
+                  placeholder={dict.otpPlaceholder}
+                />
+                <p className="text-xs text-gray-500 mt-1">{dict.otpSubtitle}</p>
+              </div>
+            ) : (
+              <div>
+                <label className="block text-sm font-medium text-gray-300 mb-1">{dict.password}</label>
+                <input
+                  type="password"
+                  required={mode === "signup" || authMethod !== "otp"}
+                  minLength={6}
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  className="w-full px-4 py-2.5 rounded-lg bg-gray-800 border border-gray-700 text-white focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                  placeholder={dict.passHint}
+                />
+              </div>
+            )}
 
             {SITE_KEY && (
               <div
@@ -170,12 +224,33 @@ export default function LoginForm({
               disabled={loading}
               className="w-full py-2.5 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white font-semibold transition disabled:opacity-50"
             >
-              {loading ? dict.processing : mode === "login" ? dict.login : dict.signup}
+              {loading
+                ? dict.processing
+                : authMethod === "otp" && mode === "login"
+                  ? otpSent
+                    ? dict.otpVerify
+                    : dict.otpSend
+                  : mode === "login"
+                    ? dict.login
+                    : dict.signup}
             </button>
           </div>
         </form>
 
         <p className="text-center text-gray-500 mt-6 text-sm">
+          {mode === "login" && (
+            <button
+              onClick={() => {
+                setAuthMethod(authMethod === "otp" ? "password" : "otp");
+                setOtpSent(false);
+                setOtpCode("");
+                setMessage(null);
+              }}
+              className="text-emerald-400 hover:underline mb-3 block mx-auto"
+            >
+              {authMethod === "otp" ? dict.passwordSwitch : dict.otpSwitch}
+            </button>
+          )}
           {mode === "login" ? (
             <>
               {dict.noAccount}{" "}
