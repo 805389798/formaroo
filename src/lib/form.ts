@@ -1,5 +1,4 @@
 import { createAdminClient } from "./supabase/server";
-import crypto from "crypto";
 
 /**
  * 表单提交处理核心
@@ -180,7 +179,9 @@ async function fireWebhook(url: string, payload: unknown) {
 export function generateFormId(): string {
   const alphabet = "abcdefghijkmnpqrstuvwxyz23456789"; // 去掉 l,o,0,1
   let id = "";
-  const bytes = crypto.randomBytes(9);
+  // Web Crypto API(Cloudflare Workers / Node 原生支持,避免 Node 内置 crypto 模块兼容问题)
+  const bytes = new Uint8Array(9);
+  globalThis.crypto.getRandomValues(bytes);
   for (let i = 0; i < 9; i++) {
     id += alphabet[bytes[i] % alphabet.length];
   }
