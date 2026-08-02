@@ -1,6 +1,12 @@
-User-agent: *
-Allow: /
-Disallow: /dashboard
-Disallow: /api/
+import type { MetadataRoute } from "next";
 
-Sitemap: https://formaroo.yearn05.top/sitemap.xml
+export default function robots(): MetadataRoute.Robots {
+  return {
+    rules: {
+      userAgent: "*",
+      allow: "/",
+      disallow: ["/dashboard", "/api/"],
+    },
+    sitemap: "https://formaroo.yearn05.top/sitemap.xml",
+  };
+}
