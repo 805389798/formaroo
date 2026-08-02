@@ -6,8 +6,41 @@ import { NextRequest, NextResponse } from "next/server";
  *
  * 浏览器 → 本端点 → challenges.cloudflare.com siteverify → 放行/拒绝
  * secret 从环境变量 TURNSTILE_SECRET 读取(不硬编码,不落库)
+ *
+ * 额外防线:IP 频率限制 —— 防脚本对验证端点本身的批量调用(纵深防御)
  */
+
+// 每分钟每个 IP 最多 20 次验证尝试(真人足够,脚本被掐)
+const RATE_LIMIT_WINDOW_MS = 60_000;
+const RATE_LIMIT_MAX = 20;
+const ipHits = new Map<string, { count: number; windowStart: number }>();
+
+function rateLimit(ip: string): boolean {
+  const now = Date.now();
+  const entry = ipHits.get(ip);
+  if (!entry || now - entry.windowStart > RATE_LIMIT_WINDOW_MS) {
+    ipHits.set(ip, { count: 1, windowStart: now });
+    return true;
+  }
+  entry.count += 1;
+  return entry.count <= RATE_LIMIT_MAX;
+}
+
 export async function POST(req: NextRequest) {
+  // Cloudflare Workers(OpenNext)下拿真实客户端 IP
+  const ip =
+    req.headers.get("cf-connecting-ip") ||
+    req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ||
+    "";
+
+  // 防线 1:IP 限流(先于解析,连 body 都省得读)
+  if (ip && !rateLimit(ip)) {
+    return NextResponse.json(
+      { success: false, error: "Too many attempts, please try again later" },
+      { status: 429 }
+    );
+  }
+
   let body: { token?: string };
   try {
     body = await req.json();
@@ -19,12 +52,6 @@ export async function POST(req: NextRequest) {
   if (!token || typeof token !== "string") {
     return NextResponse.json({ success: false, error: "Missing token" }, { status: 400 });
   }
-
-  // Cloudflare Workers(OpenNext)下拿真实客户端 IP
-  const ip =
-    req.headers.get("cf-connecting-ip") ||
-    req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ||
-    "";
 
   let result: { success?: boolean };
   try {
