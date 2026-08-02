@@ -30,8 +30,10 @@
 		"NEXT_PUBLIC_SUPABASE_ANON_KEY": "sb_publishable_4s3Jsjg5HS9svgMvOZdYvQ_WHjGsVCH",
 		"GUMROAD_PRO_PERMALINK": "vemztt",
 		"GUMROAD_SCALE_PERMALINK": "formaroo-scale",
-		"NEXT_PUBLIC_SITE_URL": "https://formaroo.yearn05.top"
+		"NEXT_PUBLIC_SITE_URL": "https://formaroo.yearn05.top",
+		// Cloudflare Turnstile site key(公开);secret 走运行时 TURNSTILE_SECRET,不写这里
+		"NEXT_PUBLIC_TURNSTILE_SITE_KEY": "0x4AAAAAAEEVkLYJF0Ka0BP8"
 	}
-	// ⚠️ SUPABASE_SERVICE_ROLE_KEY 是机密,不写在这里!
+	// ⚠️ SUPABASE_SERVICE_ROLE_KEY / TURNSTILE_SECRET 是机密,不写在这里!
 	// 请在 Cloudflare 网页端(或 wrangler secret put)单独配置
 }

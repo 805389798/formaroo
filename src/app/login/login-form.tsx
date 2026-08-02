@@ -4,6 +4,7 @@ import { useState } from "react";
 import { createClient } from "@/lib/supabase/client";
 import { useRouter } from "next/navigation";
 import LanguageSwitcher from "@/components/language-switcher";
+import Script from "next/script";
 
 interface AuthDict {
   welcomeBack: string;
@@ -37,12 +38,40 @@ export default function LoginForm({
   const router = useRouter();
   const supabase = createClient();
 
+  const SITE_KEY = process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY || "";
+
+  /** 先过 Turnstile 服务端验证,通过才继续(防机器人批量注册/登录) */
+  async function verifyTurnstile(): Promise<boolean> {
+    const token = (window as unknown as { turnstile?: { getResponse: () => string } })
+      .turnstile?.getResponse();
+    if (!token) {
+      setMessage({ type: "error", text: "Please complete the security check" });
+      return false;
+    }
+    const res = await fetch("/api/turnstile", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ token }),
+    });
+    const data = await res.json().catch(() => ({ success: false }));
+    return data.success === true;
+  }
+
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setLoading(true);
     setMessage(null);
 
     try {
+      // Gate: Turnstile 验证不通过则拒绝(服务端 siteverify)
+      const passed = await verifyTurnstile();
+      if (!passed) {
+        setLoading(false);
+        // token 单次使用,失败后重置 widget 允许重试
+        (window as unknown as { turnstile?: { reset: () => void } }).turnstile?.reset();
+        return;
+      }
+
       if (mode === "signup") {
         const { data, error } = await supabase.auth.signUp({
           email,
@@ -72,6 +101,12 @@ export default function LoginForm({
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-950 px-4 relative">
+      <Script
+        src="https://challenges.cloudflare.com/turnstile/v0/api.js"
+        async
+        defer
+        strategy="afterInteractive"
+      />
       <div className="absolute top-4 right-4">
         <LanguageSwitcher />
       </div>
@@ -108,6 +143,15 @@ export default function LoginForm({
                 placeholder={dict.passHint}
               />
             </div>
+
+            {SITE_KEY && (
+              <div
+                className="cf-turnstile"
+                data-sitekey={SITE_KEY}
+                data-action="turnstile-spin-v2"
+                data-theme="dark"
+              />
+            )}
 
             {message && (
               <div
