@@ -175,7 +175,7 @@ export default function PricingClient({ dict }: { dict: PricingDict }) {
           </Link>
           <div className="flex items-center gap-4">
             <Link href="/dashboard" className="text-sm text-gray-400 hover:text-white transition font-mono">
-              {dict.title === "Pricing" ? "~/dashboard" : "~/仪表盘"}
+              {dict.title === "Pricing" ? "Dashboard" : "仪表盘"}
             </Link>
             <LanguageSwitcher />
           </div>
@@ -184,7 +184,7 @@ export default function PricingClient({ dict }: { dict: PricingDict }) {
 
       <main className="max-w-5xl mx-auto px-4 py-20">
         <h1 className="text-4xl font-mono font-bold text-center mb-4">
-          <span className="text-amber-400">$</span> {dict.title}
+          {dict.title}
         </h1>
         <p className="text-center text-gray-500 font-mono text-sm mb-14">{dict.subtitle}</p>
 
@@ -238,7 +238,7 @@ export default function PricingClient({ dict }: { dict: PricingDict }) {
         <div className="max-w-lg mx-auto mt-16 term-panel rounded-lg p-6 relative">
           {activated && <Confetti />}
           <h2 className="font-mono font-semibold mb-1">
-            <span className="text-amber-400">$</span> {dict.activateTitle}
+            {dict.activateTitle}
           </h2>
           <p className="text-sm text-gray-500 mb-4 font-mono">{dict.activateDesc}</p>
           <div className="flex flex-col sm:flex-row gap-3">
@@ -263,7 +263,7 @@ export default function PricingClient({ dict }: { dict: PricingDict }) {
                 disabled={activating || !licenseKey}
                 className="px-5 py-2.5 rounded-md btn-accent font-mono text-sm disabled:opacity-50 whitespace-nowrap"
               >
-                {activating ? "…" + dict.verifying : "$ " + dict.activate}
+                {activating ? "…" + dict.verifying : dict.activate}
               </button>
             </div>
           </div>

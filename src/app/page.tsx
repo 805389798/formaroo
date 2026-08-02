@@ -14,8 +14,7 @@ export default async function HomePage() {
         <div className="text-center fade-in-up">
           <div className="inline-flex items-center gap-2 text-xs font-mono text-amber-400 bg-amber-950/40 border border-amber-900 rounded-md px-3 py-1.5 mb-8">
             <span className="w-1.5 h-1.5 rounded-full bg-amber-400 animate-pulse"></span>
-            <span>$ formaroo --status</span>
-            <span className="text-emerald-400">▸ online</span>
+            <span>{t.hero.badge}</span>
           </div>
           <h1 className="text-4xl md:text-6xl font-mono font-bold tracking-tight leading-tight max-w-3xl mx-auto">
             {t.hero.title1}
@@ -30,7 +29,7 @@ export default async function HomePage() {
               href="/login?mode=signup"
               className="px-8 py-3.5 rounded-md btn-accent font-mono text-lg transition"
             >
-              $ {t.hero.ctaStart}
+              {t.hero.ctaStart}
             </Link>
             <a
               href="#docs"
@@ -106,9 +105,9 @@ export default async function HomePage() {
       {/* 功能:终端化编号列表 */}
       <section id="features" className="max-w-6xl mx-auto px-4 py-20">
         <h2 className="text-3xl font-mono font-bold text-center mb-4">
-          <span className="text-amber-400">$</span> {t.features.title}
+          {t.features.title}
         </h2>
-        <p className="text-center text-gray-500 font-mono text-sm mb-14"># what you get, no backend required</p>
+        <p className="text-center text-gray-500 font-mono text-sm mb-14"></p>
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
           {[
             { n: "01", icon: "⚡", t: t.features.f1.t, d: t.features.f1.d },
@@ -137,7 +136,7 @@ export default async function HomePage() {
       {/* 定价:终端表格风 */}
       <section id="pricing" className="max-w-5xl mx-auto px-4 py-20">
         <h2 className="text-3xl font-mono font-bold text-center mb-4">
-          <span className="text-amber-400">$</span> {t.pricingSection.title}
+          {t.pricingSection.title}
         </h2>
         <p className="text-center text-gray-500 font-mono text-sm mb-14">{t.pricingSection.subtitle}</p>
         <div className="grid md:grid-cols-3 gap-4">
@@ -195,7 +194,7 @@ export default async function HomePage() {
           href="/login?mode=signup"
           className="inline-block px-10 py-4 rounded-md btn-accent font-mono text-lg transition"
         >
-          $ {t.cta.button}
+          {t.cta.button}
         </Link>
       </section>
 

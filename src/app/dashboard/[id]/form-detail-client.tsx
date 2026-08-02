@@ -177,9 +177,9 @@ export default function FormDetailClient({
       <nav className="border-b border-gray-800 bg-gray-950/80 backdrop-blur sticky top-0 z-10">
         <div className="max-w-6xl mx-auto px-4 py-4 flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <Link href="/dashboard" className="text-gray-500 hover:text-gray-300 text-sm font-mono">← ~/back</Link>
+            <Link href="/dashboard" className="text-gray-500 hover:text-gray-300 text-sm font-mono">← Back</Link>
             <span className="font-mono font-bold text-white">
-              <span className="text-amber-400">~/f/</span>{form?.name}
+              <span className="text-amber-400">/f/</span>{form?.name}
             </span>
           </div>
           <div className="flex items-center gap-3">

@@ -115,7 +115,7 @@ export default function DashboardClient({ dict }: { dict: DashboardDict }) {
           <div className="flex items-center gap-4">
             <LanguageSwitcher />
             <button onClick={logout} className="text-sm font-mono text-gray-500 hover:text-gray-300">
-              $ exit
+              {dict.logout}
             </button>
           </div>
         </div>
@@ -126,7 +126,7 @@ export default function DashboardClient({ dict }: { dict: DashboardDict }) {
         {me && (
           <div className="term-panel rounded-lg p-5 mb-8">
             <div className="flex items-center justify-between mb-2">
-              <span className="text-sm text-gray-400 font-mono">$ quota --status</span>
+              <span className="text-sm text-gray-400 font-mono">{dict.usageTitle}</span>
               <span className="text-sm text-gray-300 font-mono">
                 {me.user.submissions_used} / {me.quota.toLocaleString()}
               </span>
@@ -149,7 +149,7 @@ export default function DashboardClient({ dict }: { dict: DashboardDict }) {
         {/* 表单列表 */}
         <div className="flex items-center justify-between mb-6">
           <h2 className="font-mono font-semibold text-white">
-            <span className="text-amber-400">$</span> {dict.myForms}
+            {dict.myForms}
           </h2>
           <button
             onClick={() => setShowCreate(!showCreate)}
@@ -207,7 +207,7 @@ export default function DashboardClient({ dict }: { dict: DashboardDict }) {
                     )}
                   </div>
                   <p className="text-sm text-gray-500 mt-1 font-mono">
-                    <span className="text-amber-400">~/f/</span>{form.id}
+                    <span className="text-amber-400">/f/</span>{form.id}
                   </p>
                 </div>
                 <div className="text-right">

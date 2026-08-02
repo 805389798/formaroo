@@ -172,7 +172,7 @@ export default function LoginForm({
             <span className="kangaroo-hop text-3xl" aria-hidden>🦘</span>
           </Link>
           <h1 className="text-3xl font-mono font-bold text-white">
-            <span className="text-amber-400">$</span>{" "}
+            
             {mode === "login" ? dict.welcomeBack : dict.createAccount}
           </h1>
           <p className="text-gray-400 mt-2 font-mono text-sm">{dict.subtitle}</p>
@@ -279,8 +279,8 @@ export default function LoginForm({
                     ? dict.otpVerify
                     : dict.otpSend
                   : mode === "login"
-                    ? "$ " + dict.login
-                    : "$ " + dict.signup}
+                    ? dict.login
+                    : dict.signup}
             </button>
           </div>
         </form>
