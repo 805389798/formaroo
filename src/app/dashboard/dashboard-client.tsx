@@ -47,6 +47,8 @@ export default function DashboardClient({ dict }: { dict: DashboardDict }) {
   const [creating, setCreating] = useState(false);
   const [showCreate, setShowCreate] = useState(false);
   const [newName, setNewName] = useState("");
+  const [page, setPage] = useState(0);
+  const PAGE_SIZE = 6;
   const router = useRouter();
   const supabase = createClient();
 
@@ -200,33 +202,68 @@ export default function DashboardClient({ dict }: { dict: DashboardDict }) {
             </button>
           </div>
         ) : (
-          <div className="grid gap-4">
-            {forms?.map((form) => (
-              <Link
-                key={form.id}
-                href={`/dashboard/${form.id}`}
-                className="term-panel rounded-lg p-5 hover:border-amber-700/60 transition flex items-center justify-between group"
-              >
-                <div>
-                  <div className="flex items-center gap-3">
-                    <h3 className="font-mono text-white group-hover:text-amber-400 transition">
-                      {form.name}
-                    </h3>
-                    {!form.enabled && (
-                      <span className="text-xs px-2 py-0.5 rounded bg-[#1a2230] text-gray-500 font-mono">{dict.disabled}</span>
-                    )}
+          <>
+            {/* 表单卡片网格 */}
+            <div className="grid md:grid-cols-2 gap-4">
+              {forms?.slice(page * PAGE_SIZE, (page + 1) * PAGE_SIZE).map((form) => (
+                <Link
+                  key={form.id}
+                  href={`/dashboard/${form.id}`}
+                  className="term-panel rounded-lg p-5 hover:border-amber-700/60 hover:bg-[#141a26] transition group flex flex-col justify-between gap-4"
+                >
+                  <div>
+                    <div className="flex items-center justify-between mb-2">
+                      <h3 className="font-mono font-semibold text-white group-hover:text-amber-400 transition truncate pr-2">
+                        {form.name}
+                      </h3>
+                      {/* 状态灯 */}
+                      <span
+                        className={`w-2 h-2 rounded-full shrink-0 ${
+                          form.enabled ? "bg-emerald-400 animate-pulse" : "bg-gray-600"
+                        }`}
+                        title={form.enabled ? "active" : dict.disabled}
+                      />
+                    </div>
+                    <p className="text-sm text-gray-500 font-mono truncate">
+                      <span className="text-amber-400">/f/</span>{form.id}
+                    </p>
                   </div>
-                  <p className="text-sm text-gray-500 mt-1 font-mono">
-                    <span className="text-amber-400">/f/</span>{form.id}
-                  </p>
-                </div>
-                <div className="text-right">
-                  <div className="text-lg font-mono font-semibold text-white">{form.submissions_count}</div>
-                  <div className="text-xs text-gray-500 font-mono">{dict.submissions}</div>
-                </div>
-              </Link>
-            ))}
-          </div>
+                  <div className="flex items-center justify-between pt-3 border-t border-[#1a2230]">
+                    <span className="text-xs text-gray-600 font-mono">
+                      {form.enabled ? "● live" : `○ ${dict.disabled}`}
+                    </span>
+                    <span className="flex items-baseline gap-1.5">
+                      <span className="text-lg font-mono font-bold text-white">{form.submissions_count}</span>
+                      <span className="text-xs text-gray-500 font-mono">{dict.submissions}</span>
+                    </span>
+                  </div>
+                </Link>
+              ))}
+            </div>
+
+            {/* 分页 */}
+            {forms && forms.length > PAGE_SIZE && (
+              <div className="flex items-center justify-center gap-4 mt-8">
+                <button
+                  onClick={() => setPage((p) => Math.max(0, p - 1))}
+                  disabled={page === 0}
+                  className="px-4 py-2 rounded-md bg-[#1a2230] hover:bg-[#223047] text-gray-300 font-mono text-sm disabled:opacity-30 disabled:cursor-not-allowed transition"
+                >
+                  ← {dict.myForms === "我的表单" ? "上一页" : "Prev"}
+                </button>
+                <span className="text-sm text-gray-500 font-mono">
+                  {page + 1} / {Math.ceil((forms?.length || 1) / PAGE_SIZE)}
+                </span>
+                <button
+                  onClick={() => setPage((p) => p + 1)}
+                  disabled={(page + 1) * PAGE_SIZE >= (forms?.length || 0)}
+                  className="px-4 py-2 rounded-md bg-[#1a2230] hover:bg-[#223047] text-gray-300 font-mono text-sm disabled:opacity-30 disabled:cursor-not-allowed transition"
+                >
+                  {dict.myForms === "我的表单" ? "下一页" : "Next"} →
+                </button>
+              </div>
+            )}
+          </>
         )}
       </main>
     </div>
