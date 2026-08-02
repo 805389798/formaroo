@@ -47,10 +47,24 @@ export default function DashboardClient({ dict }: { dict: DashboardDict }) {
   const [creating, setCreating] = useState(false);
   const [showCreate, setShowCreate] = useState(false);
   const [newName, setNewName] = useState("");
-  const [page, setPage] = useState(0);
+  const [searchTerm, setSearchTerm] = useState("");
+  // 页码存在 URL(?page=N),back/前进时自然恢复
+  const [page, setPage] = useState(() => {
+    if (typeof window !== "undefined") {
+      const p = Number(new URLSearchParams(window.location.search).get("page"));
+      return Number.isFinite(p) && p > 0 ? p - 1 : 0;
+    }
+    return 0;
+  });
   const PAGE_SIZE = 6;
   const router = useRouter();
   const supabase = createClient();
+
+  /** 切页:更新 state + URL(back 能恢复) */
+  function goPage(next: number) {
+    setPage(next);
+    router.replace(next === 0 ? "/dashboard" : `/dashboard?page=${next + 1}`);
+  }
 
   const load = useCallback(async () => {
     const [formsRes, meRes] = await Promise.all([
@@ -102,6 +116,15 @@ export default function DashboardClient({ dict }: { dict: DashboardDict }) {
   }
 
   const usagePct = me ? Math.min(100, Math.round((me.user.submissions_used / me.quota) * 100)) : 0;
+
+  // 搜索过滤:按名称或表单 ID 匹配(不区分大小写)
+  const filteredForms = (forms || []).filter((f) => {
+    if (!searchTerm.trim()) return true;
+    const q = searchTerm.trim().toLowerCase();
+    return f.name.toLowerCase().includes(q) || f.id.toLowerCase().includes(q);
+  });
+  const totalPages = Math.max(1, Math.ceil(filteredForms.length / PAGE_SIZE));
+  const safePage = Math.min(page, totalPages - 1);
 
   return (
     <div className="min-h-screen bg-[#0a0e14] bg-grid">
@@ -159,16 +182,30 @@ export default function DashboardClient({ dict }: { dict: DashboardDict }) {
         )}
 
         {/* 表单列表 */}
-        <div className="flex items-center justify-between mb-6">
+        <div className="flex items-center justify-between mb-6 gap-4 flex-wrap">
           <h2 className="font-mono font-semibold text-white">
             {dict.myForms}
+            <span className="ml-2 text-xs text-gray-600">({forms?.length || 0})</span>
           </h2>
-          <button
-            onClick={() => setShowCreate(!showCreate)}
-            className="px-4 py-2 rounded-md btn-accent font-mono text-sm transition"
-          >
-            + {dict.newForm}
-          </button>
+          <div className="flex items-center gap-3">
+            {/* 搜索框 */}
+            <input
+              type="text"
+              value={searchTerm}
+              onChange={(e) => {
+                setSearchTerm(e.target.value);
+                goPage(0);
+              }}
+              placeholder={dict.myForms === "我的表单" ? "搜索名称或 ID…" : "Search name or ID…"}
+              className="px-4 py-2 rounded-md bg-[#0d121b] border border-[#232b3a] text-white focus:outline-none focus:ring-2 focus:ring-amber-500 font-mono text-sm w-48"
+            />
+            <button
+              onClick={() => setShowCreate(!showCreate)}
+              className="px-4 py-2 rounded-md btn-accent font-mono text-sm transition"
+            >
+              + {dict.newForm}
+            </button>
+          </div>
         </div>
 
         {showCreate && (
@@ -201,11 +238,24 @@ export default function DashboardClient({ dict }: { dict: DashboardDict }) {
               {dict.createFirst}
             </button>
           </div>
+        ) : filteredForms.length === 0 ? (
+          <div className="term-panel rounded-lg border-dashed p-12 text-center">
+            <p className="text-gray-400 mb-2 font-mono">
+              {searchTerm ? (dict.myForms === "我的表单" ? "没有匹配的表单" : "No forms match your search") : dict.noFormsTitle}
+            </p>
+            <p className="text-sm text-gray-600 mb-6 font-mono">{dict.noFormsDesc}</p>
+            <button
+              onClick={() => setShowCreate(true)}
+              className="px-5 py-2.5 rounded-md btn-accent font-mono text-sm"
+            >
+              {dict.createFirst}
+            </button>
+          </div>
         ) : (
           <>
             {/* 表单卡片网格 */}
             <div className="grid md:grid-cols-2 gap-4">
-              {forms?.slice(page * PAGE_SIZE, (page + 1) * PAGE_SIZE).map((form) => (
+              {filteredForms.slice(safePage * PAGE_SIZE, (safePage + 1) * PAGE_SIZE).map((form) => (
                 <Link
                   key={form.id}
                   href={`/dashboard/${form.id}`}
@@ -242,21 +292,21 @@ export default function DashboardClient({ dict }: { dict: DashboardDict }) {
             </div>
 
             {/* 分页 */}
-            {forms && forms.length > PAGE_SIZE && (
+            {filteredForms.length > PAGE_SIZE && (
               <div className="flex items-center justify-center gap-4 mt-8">
                 <button
-                  onClick={() => setPage((p) => Math.max(0, p - 1))}
-                  disabled={page === 0}
+                  onClick={() => goPage(safePage - 1)}
+                  disabled={safePage === 0}
                   className="px-4 py-2 rounded-md bg-[#1a2230] hover:bg-[#223047] text-gray-300 font-mono text-sm disabled:opacity-30 disabled:cursor-not-allowed transition"
                 >
                   ← {dict.myForms === "我的表单" ? "上一页" : "Prev"}
                 </button>
                 <span className="text-sm text-gray-500 font-mono">
-                  {page + 1} / {Math.ceil((forms?.length || 1) / PAGE_SIZE)}
+                  {safePage + 1} / {totalPages}
                 </span>
                 <button
-                  onClick={() => setPage((p) => p + 1)}
-                  disabled={(page + 1) * PAGE_SIZE >= (forms?.length || 0)}
+                  onClick={() => goPage(safePage + 1)}
+                  disabled={safePage + 1 >= totalPages}
                   className="px-4 py-2 rounded-md bg-[#1a2230] hover:bg-[#223047] text-gray-300 font-mono text-sm disabled:opacity-30 disabled:cursor-not-allowed transition"
                 >
                   {dict.myForms === "我的表单" ? "下一页" : "Next"} →
