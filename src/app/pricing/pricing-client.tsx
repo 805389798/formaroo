@@ -58,6 +58,7 @@ function Confetti() {
 
 export default function PricingClient({ dict }: { dict: PricingDict }) {
   const [loggedIn, setLoggedIn] = useState<boolean | null>(null);
+  const [currentPlan, setCurrentPlan] = useState<string | null>(null);
   const [loadingVariant, setLoadingVariant] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [licenseKey, setLicenseKey] = useState("");
@@ -69,9 +70,20 @@ export default function PricingClient({ dict }: { dict: PricingDict }) {
 
   useEffect(() => {
     fetch("/api/me").then(async (res) => {
-      setLoggedIn(res.status === 200);
+      if (res.status === 200) {
+        setLoggedIn(true);
+        const data = await res.json();
+        setCurrentPlan(data.user?.plan || null);
+      } else {
+        setLoggedIn(false);
+      }
     });
   }, []);
+
+  /** 已激活的目标计划 = 当前计划(不能重复激活同档) */
+  function isCurrent(plan: string): boolean {
+    return !!currentPlan && currentPlan === plan.toLowerCase();
+  }
 
   async function subscribe(variant: "pro" | "scale") {
     setLoadingVariant(variant);
@@ -221,15 +233,28 @@ export default function PricingClient({ dict }: { dict: PricingDict }) {
                   </li>
                 ))}
               </ul>
-              <button
-                onClick={p.action}
-                disabled={loadingVariant === p.name.toLowerCase()}
-                className={`mt-8 w-full text-center py-3 rounded-md font-mono transition disabled:opacity-50 ${
-                  p.highlight ? "btn-accent" : "bg-[#1a2230] hover:bg-[#223047] text-gray-300"
-                }`}
-              >
-                {loadingVariant === p.name.toLowerCase() ? "…" + dict.goPay : p.cta}
-              </button>
+              {isCurrent(p.name) ? (
+                <button
+                  disabled
+                  className={`mt-8 w-full text-center py-3 rounded-md font-mono transition cursor-default ${
+                    p.highlight
+                      ? "bg-amber-950/60 text-amber-400 border border-amber-800"
+                      : "bg-[#1a2230] text-gray-500"
+                  }`}
+                >
+                  ✓ {dict.mostPopular === "★ 推荐" ? "当前计划" : "Current plan"}
+                </button>
+              ) : (
+                <button
+                  onClick={p.action}
+                  disabled={loadingVariant === p.name.toLowerCase()}
+                  className={`mt-8 w-full text-center py-3 rounded-md font-mono transition disabled:opacity-50 ${
+                    p.highlight ? "btn-accent" : "bg-[#1a2230] hover:bg-[#223047] text-gray-300"
+                  }`}
+                >
+                  {loadingVariant === p.name.toLowerCase() ? "…" + dict.goPay : p.cta}
+                </button>
+              )}
             </div>
           ))}
         </div>
@@ -278,12 +303,39 @@ export default function PricingClient({ dict }: { dict: PricingDict }) {
               {activateMsg.type === "error" ? "✗ " : "✓ "}{activateMsg.text}
               {activateMsg.type === "success" && (
                 <span className="block mt-1 text-xs text-gray-500 animate-pulse">
-                  → redirecting to ~/dashboard...
+                  → redirecting to dashboard...
                 </span>
               )}
             </div>
           )}
         </div>
+
+        {/* 管理订阅(退订/改期入口) */}
+        {currentPlan && currentPlan !== "free" && (
+          <div className="max-w-lg mx-auto mt-6 term-panel rounded-lg p-5 border-amber-900/40">
+            <div className="flex items-center justify-between gap-4 flex-wrap">
+              <div>
+                <p className="text-sm text-gray-300 font-mono">
+                  {dict.title === "Pricing" ? "Active plan:" : "当前计划:"}{" "}
+                  <span className="text-amber-400 font-bold">{currentPlan}</span>
+                </p>
+                <p className="text-xs text-gray-600 mt-1 font-mono">
+                  {dict.title === "Pricing"
+                    ? "Manage or cancel your subscription anytime on Gumroad."
+                    : "随时可在 Gumroad 管理或退订你的订阅。"}
+                </p>
+              </div>
+              <a
+                href="https://gumroad.com/library"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="px-4 py-2 rounded-md bg-[#1a2230] hover:bg-[#223047] text-gray-300 text-sm font-mono transition"
+              >
+                {dict.title === "Pricing" ? "Manage subscription →" : "管理订阅 →"}
+              </a>
+            </div>
+          </div>
+        )}
       </main>
     </div>
   );

@@ -103,6 +103,7 @@ export interface Dictionary {
     submissions: string;
     disabled: string;
     logout: string;
+    manageSub: string;
   };
   formDetail: {
     loading: string;
@@ -283,6 +284,7 @@ export const dictionaries: Record<Locale, Dictionary> = {
       submissions: "submissions",
       disabled: "Disabled",
       logout: "Log out",
+      manageSub: "Manage subscription →",
     },
     formDetail: {
       loading: "Loading...",
@@ -461,6 +463,7 @@ export const dictionaries: Record<Locale, Dictionary> = {
       submissions: "条提交",
       disabled: "已停用",
       logout: "退出",
+      manageSub: "管理订阅 →",
     },
     formDetail: {
       loading: "加载中...",

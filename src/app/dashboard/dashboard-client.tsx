@@ -37,6 +37,7 @@ interface DashboardDict {
   submissions: string;
   disabled: string;
   logout: string;
+  manageSub: string;
 }
 
 export default function DashboardClient({ dict }: { dict: DashboardDict }) {
@@ -139,7 +140,16 @@ export default function DashboardClient({ dict }: { dict: DashboardDict }) {
             </div>
             <div className="mt-3 flex justify-between text-xs font-mono">
               <span className="text-gray-500">{dict.remaining} {me.remaining.toLocaleString()}</span>
-              {me.user.plan === "free" && (
+              {me.user.plan !== "free" ? (
+                <a
+                  href="https://gumroad.com/library"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-amber-400 term-link"
+                >
+                  {dict.manageSub}
+                </a>
+              ) : (
                 <Link href="/pricing" className="text-amber-400 term-link">{dict.upgrade}</Link>
               )}
             </div>
