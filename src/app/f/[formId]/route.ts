@@ -56,7 +56,9 @@ export async function POST(
     );
   } catch (err) {
     console.error("[formaroo] submit error:", err);
-    return Response.json({ success: false, message: "Invalid request" }, { status: 400 });
+    // 开发诊断:临时返回真实错误(上线后改回隐藏)
+    const message = err instanceof Error ? err.message : String(err);
+    return Response.json({ success: false, message: `Invalid request: ${message}` }, { status: 400 });
   }
 }
 
