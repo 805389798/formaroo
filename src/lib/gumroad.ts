@@ -16,6 +16,10 @@ const GUMROAD_API = "https://api.gumroad.com/v2/licenses/verify";
 // 产品 permalink(在 Gumroad 产品 URL 里,gumroad.com/l/<permalink>)
 export const GUMROAD_PRO_PERMALINK = process.env.GUMROAD_PRO_PERMALINK || "";
 export const GUMROAD_SCALE_PERMALINK = process.env.GUMROAD_SCALE_PERMALINK || "";
+// 产品内部 ID(Gumroad License API 用 product_id 验证,不是 permalink!
+// 获取方式:激活时若缺 product_id,Gumroad 报错 "Please set 'product_id' to 'xxx'" 即为此值)
+export const GUMROAD_PRO_PRODUCT_ID = process.env.GUMROAD_PRO_PRODUCT_ID || "fi_ZuzRirjmnTfJZHhCkzA==";
+export const GUMROAD_SCALE_PRODUCT_ID = process.env.GUMROAD_SCALE_PRODUCT_ID || "wV41fEMmmTWyXp6pUe7_Rw==";
 
 /** 产品购买页 URL(给用户跳转) */
 export function productUrl(plan: "pro" | "scale"): string {
@@ -40,19 +44,26 @@ export interface LicenseVerifyResult {
  */
 export async function verifyLicense(
   licenseKey: string,
-  permalink: string
+  permalink: string,
+  productId?: string
 ): Promise<LicenseVerifyResult> {
   if (!licenseKey || !permalink) {
     return { success: false, plan: null, message: "Missing license key or product" };
   }
 
+  // Gumroad License API 需要 product_id(新要求),同时也传 permalink(兼容旧逻辑)
+  const params = new URLSearchParams({
+    product_permalink: permalink,
+    license_key: licenseKey,
+  });
+  if (productId) {
+    params.set("product_id", productId);
+  }
+
   const res = await fetch(GUMROAD_API, {
     method: "POST",
     headers: { "Content-Type": "application/x-www-form-urlencoded" },
-    body: new URLSearchParams({
-      product_permalink: permalink,
-      license_key: licenseKey,
-    }),
+    body: params,
   });
 
   const data = await res.json().catch(() => null);

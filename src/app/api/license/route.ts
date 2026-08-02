@@ -1,6 +1,12 @@
 import { NextRequest } from "next/server";
 import { createClient } from "@/lib/supabase/server";
-import { verifyLicense, GUMROAD_PRO_PERMALINK, GUMROAD_SCALE_PERMALINK } from "@/lib/gumroad";
+import {
+  verifyLicense,
+  GUMROAD_PRO_PERMALINK,
+  GUMROAD_SCALE_PERMALINK,
+  GUMROAD_PRO_PRODUCT_ID,
+  GUMROAD_SCALE_PRODUCT_ID,
+} from "@/lib/gumroad";
 
 /**
  * 激活 Gumroad license key
@@ -17,16 +23,18 @@ export async function POST(request: NextRequest) {
     return Response.json({ error: "license_key and plan are required" }, { status: 400 });
   }
 
-  // 根据目标 plan 选择正确的 permalink
+  // 根据目标 plan 选择正确的 permalink + product_id
   const permalink =
     plan === "scale" ? GUMROAD_SCALE_PERMALINK : plan === "pro" ? GUMROAD_PRO_PERMALINK : null;
+  const productId =
+    plan === "scale" ? GUMROAD_SCALE_PRODUCT_ID : plan === "pro" ? GUMROAD_PRO_PRODUCT_ID : null;
 
-  if (!permalink) {
+  if (!permalink || !productId) {
     return Response.json({ error: "Invalid plan" }, { status: 400 });
   }
 
-  // 调 Gumroad 验证
-  const result = await verifyLicense(license_key, permalink);
+  // 调 Gumroad 验证(传 product_id,Gumroad 新要求)
+  const result = await verifyLicense(license_key, permalink, productId);
 
   if (!result.success || !result.plan) {
     return Response.json(
