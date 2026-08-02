@@ -2,16 +2,29 @@ import type { Metadata } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "Formaroo — 给开发者的表单后端 API",
+  // 英文主标题(目标用户是欧美开发者,Google 搜索 SEO)
+  title: "Formaroo — Form Backend API for Developers | No Backend Code",
   description:
-    "Formaroo 是简单的表单提交 API。把 HTML 表单 action 指向 Formaroo,提交自动存储、通知、转发,不用写一行后端代码。免费开始,三行代码接入。",
-  keywords: ["form backend", "form api", "formspree alternative", "表单后端", "表单API", "form submission"],
+    "Formaroo is a simple form submission API. Point your HTML form action at Formaroo — submissions are stored, spam-filtered, and forwarded automatically. No backend code, 3 lines to integrate, free tier included.",
+  keywords: [
+    "form backend",
+    "form api",
+    "formspree alternative",
+    "form backend service",
+    "html form submission api",
+    "form endpoint",
+    "表单后端",
+    "表单API",
+  ],
   openGraph: {
-    title: "Formaroo — 给开发者的表单后端 API",
-    description: "三行代码接入表单后端。自动存储、反垃圾、Webhook 转发。",
+    title: "Formaroo — Form Backend API for Developers",
+    description:
+      "3-line form backend. Automatic storage, spam protection, webhooks, redirects. Free tier, no credit card.",
     type: "website",
     siteName: "Formaroo",
+    url: "https://formaroo.yearn05.top",
   },
+  robots: { index: true, follow: true },
 };
 
 export default function RootLayout({
@@ -20,7 +33,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="zh-CN">
+    <html lang="en">
       <body className="antialiased">{children}</body>
     </html>
   );
