@@ -6,7 +6,7 @@
 
 ## 功能
 
-- ⚡ 三行代码接入:`<form action="https://formaroo.yearn05.com/f/{FORM_ID}" method="POST">`
+- ⚡ 三行代码接入:`<form action="https://formaroo.yearn05.top/f/{FORM_ID}" method="POST">`
 - 📥 提交自动入库(Supabase Postgres)
 - 🛡️ 内置反垃圾:蜜罐字段 + IP 频率限制
 - 🔗 Webhook 转发:提交后实时 POST 到你的服务器
