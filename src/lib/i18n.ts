@@ -83,6 +83,8 @@ export interface Dictionary {
     otpSwitch: string;
     passwordSwitch: string;
     otpPlaceholder: string;
+    googleLogin: string;
+    orDivider: string;
   };
   dashboard: {
     loading: string;
@@ -261,6 +263,8 @@ export const dictionaries: Record<Locale, Dictionary> = {
       otpSwitch: "Use email code instead",
       passwordSwitch: "Use password instead",
       otpPlaceholder: "6-digit code",
+      googleLogin: "Continue with Google",
+      orDivider: "or",
     },
     dashboard: {
       loading: "Loading...",
@@ -437,6 +441,8 @@ export const dictionaries: Record<Locale, Dictionary> = {
       otpSwitch: "改用邮箱验证码登录",
       passwordSwitch: "改用密码登录",
       otpPlaceholder: "6 位验证码",
+      googleLogin: "使用 Google 账号登录",
+      orDivider: "或",
     },
     dashboard: {
       loading: "加载中...",
