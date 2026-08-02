@@ -8,6 +8,10 @@ export default function PricingPage() {
   const [loggedIn, setLoggedIn] = useState<boolean | null>(null);
   const [loadingVariant, setLoadingVariant] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [licenseKey, setLicenseKey] = useState("");
+  const [activatePlan, setActivatePlan] = useState<"pro" | "scale">("pro");
+  const [activating, setActivating] = useState(false);
+  const [activateMsg, setActivateMsg] = useState<{ type: "error" | "success"; text: string } | null>(null);
   const router = useRouter();
 
   useEffect(() => {
@@ -39,6 +43,33 @@ export default function PricingPage() {
       setError("网络错误,请稍后再试");
     } finally {
       setLoadingVariant(null);
+    }
+  }
+
+  async function activateLicense() {
+    if (!licenseKey.trim()) return;
+    setActivating(true);
+    setActivateMsg(null);
+    try {
+      const res = await fetch("/api/license", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ license_key: licenseKey.trim(), plan: activatePlan }),
+      });
+      const data = await res.json();
+      if (res.ok && data.success) {
+        setActivateMsg({
+          type: "success",
+          text: `🎉 激活成功!已升级到 ${data.plan === "scale" ? "Scale" : "Pro"} 计划,刷新后生效。`,
+        });
+        setLicenseKey("");
+      } else {
+        setActivateMsg({ type: "error", text: data.error || "激活失败,请检查 license key" });
+      }
+    } catch {
+      setActivateMsg({ type: "error", text: "网络错误,请稍后再试" });
+    } finally {
+      setActivating(false);
     }
   }
 
@@ -135,6 +166,49 @@ export default function PricingPage() {
               {loadingVariant === "scale" ? "跳转支付..." : "升级 Scale"}
             </button>
           </div>
+        </div>
+
+        {/* License key 激活 */}
+        <div className="max-w-lg mx-auto mt-16 bg-gray-900 rounded-2xl p-6 border border-gray-800">
+          <h2 className="text-lg font-semibold mb-1">已有 License Key?</h2>
+          <p className="text-sm text-gray-500 mb-4">
+            在 Gumroad 付款后,我们会把 license key 发到你的邮箱。粘贴到这里即可激活对应计划。
+          </p>
+          <div className="flex gap-3">
+            <input
+              type="text"
+              value={licenseKey}
+              onChange={(e) => setLicenseKey(e.target.value)}
+              placeholder="粘贴 Gumroad license key"
+              className="flex-1 px-4 py-2.5 rounded-lg bg-gray-800 border border-gray-700 text-white focus:outline-none focus:ring-2 focus:ring-emerald-500 font-mono text-sm"
+            />
+            <select
+              value={activatePlan}
+              onChange={(e) => setActivatePlan(e.target.value as "pro" | "scale")}
+              className="px-3 py-2.5 rounded-lg bg-gray-800 border border-gray-700 text-white text-sm focus:outline-none"
+            >
+              <option value="pro">Pro</option>
+              <option value="scale">Scale</option>
+            </select>
+            <button
+              onClick={activateLicense}
+              disabled={activating || !licenseKey}
+              className="px-5 py-2.5 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white text-sm font-medium disabled:opacity-50"
+            >
+              {activating ? "验证中..." : "激活"}
+            </button>
+          </div>
+          {activateMsg && (
+            <div
+              className={`mt-3 text-sm px-4 py-3 rounded-lg ${
+                activateMsg.type === "error"
+                  ? "bg-red-900/50 text-red-300 border border-red-800"
+                  : "bg-emerald-900/50 text-emerald-300 border border-emerald-800"
+              }`}
+            >
+              {activateMsg.text}
+            </div>
+          )}
         </div>
       </main>
     </div>
