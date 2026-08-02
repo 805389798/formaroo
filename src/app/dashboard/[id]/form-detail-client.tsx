@@ -177,24 +177,26 @@ export default function FormDetailClient({
       <nav className="border-b border-gray-800 bg-gray-950/80 backdrop-blur sticky top-0 z-10">
         <div className="max-w-6xl mx-auto px-4 py-4 flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <Link href="/dashboard" className="text-gray-500 hover:text-gray-300 text-sm">← Back</Link>
-            <span className="text-xl font-bold text-white">{form?.name}</span>
+            <Link href="/dashboard" className="text-gray-500 hover:text-gray-300 text-sm font-mono">← ~/back</Link>
+            <span className="font-mono font-bold text-white">
+              <span className="text-amber-400">~/f/</span>{form?.name}
+            </span>
           </div>
           <div className="flex items-center gap-3">
             <LanguageSwitcher />
             <button
               onClick={toggleEnabled}
-              className={`text-sm px-3 py-1.5 rounded-lg border transition ${
+              className={`text-sm px-3 py-1.5 rounded-md border font-mono transition ${
                 form?.enabled
                   ? "border-gray-700 text-gray-300 hover:border-red-700 hover:text-red-400"
-                  : "border-emerald-700 text-emerald-400 hover:bg-emerald-900/30"
+                  : "border-amber-700 text-amber-400 hover:bg-amber-900/30"
               }`}
             >
               {form?.enabled ? dict.disable : dict.enable}
             </button>
             <button
               onClick={deleteForm}
-              className="text-sm px-3 py-1.5 rounded-lg border border-gray-800 text-gray-500 hover:text-red-400 hover:border-red-800 transition"
+              className="text-sm px-3 py-1.5 rounded-md border border-gray-800 text-gray-500 hover:text-red-400 hover:border-red-800 transition font-mono"
             >
               {dict.delete}
             </button>
@@ -202,31 +204,31 @@ export default function FormDetailClient({
         </div>
       </nav>
 
-      <main className="max-w-6xl mx-auto px-4 py-8 space-y-8">
+      <main className="max-w-6xl mx-auto px-4 py-8 space-y-8 fade-in-up">
         {/* 接入代码 */}
-        <section className="bg-gray-900 rounded-2xl border border-gray-800 p-6">
+        <section className="term-panel rounded-lg p-6">
           <div className="flex items-center justify-between mb-4">
-            <h2 className="text-lg font-semibold text-white">{dict.integrate}</h2>
+            <h2 className="font-mono font-semibold text-white"><span className="text-amber-400">$</span> {dict.integrate}</h2>
             <button
               onClick={copyEndpoint}
-              className="text-sm px-3 py-1.5 rounded-lg bg-gray-800 hover:bg-gray-700 text-gray-300 transition"
+              className="text-sm px-3 py-1.5 rounded-md bg-[#1a2230] hover:bg-[#223047] text-gray-300 transition font-mono"
             >
               {copied ? dict.copied : dict.copyEndpoint}
             </button>
           </div>
-          <p className="text-sm text-gray-500 mb-3">
-            {dict.endpoint}: <code className="text-emerald-400 bg-gray-800 px-2 py-0.5 rounded font-mono">{formEndpoint(formId)}</code>
+          <p className="text-sm text-gray-500 mb-3 font-mono">
+            {dict.endpoint}: <code className="text-amber-400 bg-[#0d121b] px-2 py-0.5 rounded font-mono border border-[#232b3a]">{formEndpoint(formId)}</code>
           </p>
           <div className="grid md:grid-cols-2 gap-4">
             <div>
-              <p className="text-xs text-gray-500 mb-2 font-medium">{dict.htmlLabel}</p>
-              <pre className="text-xs bg-gray-950 rounded-xl p-4 overflow-x-auto text-gray-300 leading-relaxed">
+              <p className="text-xs text-gray-500 mb-2 font-mono">{dict.htmlLabel}</p>
+              <pre className="text-xs bg-[#0d121b] rounded-lg p-4 overflow-x-auto text-gray-300 leading-relaxed border border-[#1a2230]">
                 <code>{htmlSnippet}</code>
               </pre>
             </div>
             <div>
-              <p className="text-xs text-gray-500 mb-2 font-medium">{dict.jsLabel}</p>
-              <pre className="text-xs bg-gray-950 rounded-xl p-4 overflow-x-auto text-gray-300 leading-relaxed">
+              <p className="text-xs text-gray-500 mb-2 font-mono">{dict.jsLabel}</p>
+              <pre className="text-xs bg-[#0d121b] rounded-lg p-4 overflow-x-auto text-gray-300 leading-relaxed border border-[#1a2230]">
                 <code>{jsSnippet}</code>
               </pre>
             </div>
@@ -234,9 +236,9 @@ export default function FormDetailClient({
         </section>
 
         {/* 设置 */}
-        <section className="bg-gray-900 rounded-2xl border border-gray-800 p-6">
+        <section className="term-panel rounded-lg p-6">
           <div className="flex items-center justify-between mb-4">
-            <h2 className="text-lg font-semibold text-white">{dict.settings}</h2>
+            <h2 className="font-mono font-semibold text-white"><span className="text-amber-400">$</span> {dict.settings}</h2>
             {!editing && (
               <button
                 onClick={() => setEditing(true)}
@@ -250,31 +252,31 @@ export default function FormDetailClient({
           {editing ? (
             <form onSubmit={saveSettings} className="space-y-4">
               <div>
-                <label className="block text-sm text-gray-400 mb-1">{dict.formName}</label>
+                <label className="block text-sm text-gray-400 mb-1 font-mono">{dict.formName}</label>
                 <input
                   value={name}
                   onChange={(e) => setName(e.target.value)}
-                  className="w-full px-4 py-2.5 rounded-lg bg-gray-800 border border-gray-700 text-white focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                  className="w-full px-4 py-2.5 rounded-md bg-[#0d121b] border border-[#232b3a] text-white focus:outline-none focus:ring-2 focus:ring-amber-500 font-mono"
                 />
               </div>
               <div>
-                <label className="block text-sm text-gray-400 mb-1">{dict.redirectUrl}</label>
+                <label className="block text-sm text-gray-400 mb-1 font-mono">{dict.redirectUrl}</label>
                 <input
                   value={redirectUrl}
                   onChange={(e) => setRedirectUrl(e.target.value)}
                   placeholder="https://your-site.com/thanks"
-                  className="w-full px-4 py-2.5 rounded-lg bg-gray-800 border border-gray-700 text-white focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                  className="w-full px-4 py-2.5 rounded-md bg-[#0d121b] border border-[#232b3a] text-white focus:outline-none focus:ring-2 focus:ring-amber-500 font-mono"
                 />
               </div>
               <div>
-                <label className="block text-sm text-gray-400 mb-1">{dict.webhookUrl}</label>
+                <label className="block text-sm text-gray-400 mb-1 font-mono">{dict.webhookUrl}</label>
                 <input
                   value={webhookUrl}
                   onChange={(e) => setWebhookUrl(e.target.value)}
                   placeholder="https://your-site.com/hook"
-                  className="w-full px-4 py-2.5 rounded-lg bg-gray-800 border border-gray-700 text-white focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                  className="w-full px-4 py-2.5 rounded-md bg-[#0d121b] border border-[#232b3a] text-white focus:outline-none focus:ring-2 focus:ring-amber-500 font-mono"
                 />
-                <p className="text-xs text-gray-600 mt-1">{dict.webhookHint}</p>
+                <p className="text-xs text-gray-600 mt-1 font-mono">{dict.webhookHint}</p>
               </div>
               <div className="flex gap-3">
                 <button

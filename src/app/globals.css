@@ -1,8 +1,13 @@
 @import "tailwindcss";
 
 :root {
-  --background: #030712;
-  --foreground: #ededed;
+  --background: #0a0e14;
+  --foreground: #e8e6e3;
+  --accent: #f59e0b; /* 琥珀:袋鼠/澳洲沙漠 */
+  --accent-dim: #b45309;
+  --term-green: #4ade80;
+  --panel: #11161f;
+  --border: #232b3a;
 }
 
 @theme inline {
@@ -16,4 +21,132 @@ body {
   background: var(--background);
   color: var(--foreground);
   font-family: var(--font-sans), system-ui, -apple-system, sans-serif;
+}
+
+/* ============ 终端美学 ============ */
+
+/* 点阵网格背景(全局) */
+.bg-grid {
+  background-image:
+    linear-gradient(rgba(148, 163, 184, 0.05) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(148, 163, 184, 0.05) 1px, transparent 1px);
+  background-size: 32px 32px;
+}
+
+/* 扫描线动画(终端 CRT 感) */
+.scanline::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: linear-gradient(
+    to bottom,
+    transparent 0%,
+    rgba(245, 158, 11, 0.03) 50%,
+    transparent 100%
+  );
+  background-size: 100% 8px;
+  animation: scan 8s linear infinite;
+}
+@keyframes scan {
+  0% { transform: translateY(-100%); }
+  100% { transform: translateY(100%); }
+}
+
+/* 光标闪烁(终端提示符) */
+.cursor-blink::after {
+  content: "▊";
+  margin-left: 2px;
+  color: var(--accent);
+  animation: blink 1s step-end infinite;
+}
+@keyframes blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0; }
+}
+
+/* 打字机效果 */
+.typing {
+  display: inline-block;
+  overflow: hidden;
+  white-space: nowrap;
+  border-right: 2px solid var(--accent);
+  animation: typing 2.5s steps(30, end), caret 0.75s step-end infinite;
+}
+@keyframes typing {
+  from { width: 0; }
+  to { width: 100%; }
+}
+@keyframes caret {
+  0%, 100% { border-color: transparent; }
+  50% { border-color: var(--accent); }
+}
+
+/* 进入动画 */
+.fade-in-up {
+  animation: fadeInUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(16px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* 成功庆祝:礼花 */
+.confetti-piece {
+  position: absolute;
+  width: 8px;
+  height: 8px;
+  animation: confetti 1.6s ease-out both;
+}
+@keyframes confetti {
+  0% { opacity: 1; transform: translateY(0) rotate(0); }
+  100% { opacity: 0; transform: translateY(-120px) rotate(720deg); }
+}
+
+/* 袋鼠跳跃(品牌动画) */
+.kangaroo-hop {
+  display: inline-block;
+  animation: hop 2.2s ease-in-out infinite;
+}
+@keyframes hop {
+  0%, 100% { transform: translateY(0) rotate(-4deg); }
+  50% { transform: translateY(-8px) rotate(4deg); }
+}
+
+/* 按钮悬停微光 */
+.btn-accent {
+  background: var(--accent);
+  color: #1a1206;
+  font-weight: 600;
+  transition: all 0.2s ease;
+}
+.btn-accent:hover {
+  background: #fbbf24;
+  box-shadow: 0 0 24px rgba(245, 158, 11, 0.35);
+  transform: translateY(-1px);
+}
+
+/* 面板(锐利边框,终端感) */
+.term-panel {
+  background: var(--panel);
+  border: 1px solid var(--border);
+}
+
+/* 链接悬停下划线 */
+.term-link {
+  position: relative;
+  color: var(--accent);
+}
+.term-link::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  bottom: -2px;
+  width: 0;
+  height: 1px;
+  background: var(--accent);
+  transition: width 0.25s ease;
+}
+.term-link:hover::after {
+  width: 100%;
 }

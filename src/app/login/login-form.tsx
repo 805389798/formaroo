@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { createClient } from "@/lib/supabase/client";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 import LanguageSwitcher from "@/components/language-switcher";
 import Script from "next/script";
 
@@ -155,7 +156,7 @@ export default function LoginForm({
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-950 px-4 relative">
+    <div className="min-h-screen flex items-center justify-center bg-[#0a0e14] px-4 relative bg-grid">
       <Script
         src="https://challenges.cloudflare.com/turnstile/v0/api.js"
         async
@@ -165,20 +166,24 @@ export default function LoginForm({
       <div className="absolute top-4 right-4">
         <LanguageSwitcher />
       </div>
-      <div className="w-full max-w-md">
+      <div className="w-full max-w-md fade-in-up">
         <div className="text-center mb-8">
-          <h1 className="text-3xl font-bold text-white">
+          <Link href="/" className="inline-block mb-4">
+            <span className="kangaroo-hop text-3xl" aria-hidden>🦘</span>
+          </Link>
+          <h1 className="text-3xl font-mono font-bold text-white">
+            <span className="text-amber-400">$</span>{" "}
             {mode === "login" ? dict.welcomeBack : dict.createAccount}
           </h1>
-          <p className="text-gray-400 mt-2">{dict.subtitle}</p>
+          <p className="text-gray-400 mt-2 font-mono text-sm">{dict.subtitle}</p>
         </div>
 
-        <div className="bg-gray-900 rounded-2xl p-8 shadow-xl border border-gray-800">
+        <div className="term-panel rounded-lg p-8">
           <button
             type="button"
             onClick={handleGoogleLogin}
             disabled={loading}
-            className="w-full py-2.5 rounded-lg bg-white hover:bg-gray-100 text-gray-800 font-semibold transition disabled:opacity-50 flex items-center justify-center gap-2"
+            className="w-full py-2.5 rounded-md bg-white hover:bg-gray-100 text-gray-800 font-semibold transition disabled:opacity-50 flex items-center justify-center gap-2"
           >
             <svg className="w-5 h-5" viewBox="0 0 24 24">
               <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 0 1-2.2 3.32v2.77h3.57c2.08-1.92 3.27-4.74 3.27-8.1z"/>
@@ -190,28 +195,28 @@ export default function LoginForm({
           </button>
 
           <div className="flex items-center gap-3 my-4">
-            <div className="flex-1 h-px bg-gray-700" />
-            <span className="text-xs text-gray-500">{dict.orDivider}</span>
-            <div className="flex-1 h-px bg-gray-700" />
+            <div className="flex-1 h-px bg-[#232b3a]" />
+            <span className="text-xs text-gray-500 font-mono">{dict.orDivider}</span>
+            <div className="flex-1 h-px bg-[#232b3a]" />
           </div>
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="space-y-4">
             <div>
-              <label className="block text-sm font-medium text-gray-300 mb-1">{dict.email}</label>
+              <label className="block text-sm font-medium text-gray-300 mb-1 font-mono">{dict.email}</label>
               <input
                 type="email"
                 required
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className="w-full px-4 py-2.5 rounded-lg bg-gray-800 border border-gray-700 text-white focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                className="w-full px-4 py-2.5 rounded-md bg-[#0d121b] border border-[#232b3a] text-white focus:outline-none focus:ring-2 focus:ring-amber-500 font-mono"
                 placeholder="you@example.com"
               />
             </div>
 
             {authMethod === "otp" && mode === "login" ? (
               <div>
-                <label className="block text-sm font-medium text-gray-300 mb-1">{dict.otpTitle}</label>
+                <label className="block text-sm font-medium text-gray-300 mb-1 font-mono">{dict.otpTitle}</label>
                 <input
                   type="text"
                   required
@@ -221,21 +226,21 @@ export default function LoginForm({
                   value={otpCode}
                   onChange={(e) => setOtpCode(e.target.value)}
                   disabled={!otpSent}
-                  className="w-full px-4 py-2.5 rounded-lg bg-gray-800 border border-gray-700 text-white focus:outline-none focus:ring-2 focus:ring-emerald-500 disabled:opacity-50"
+                  className="w-full px-4 py-2.5 rounded-md bg-[#0d121b] border border-[#232b3a] text-white focus:outline-none focus:ring-2 focus:ring-amber-500 disabled:opacity-50 font-mono tracking-widest"
                   placeholder={dict.otpPlaceholder}
                 />
-                <p className="text-xs text-gray-500 mt-1">{dict.otpSubtitle}</p>
+                <p className="text-xs text-gray-500 mt-1 font-mono">{dict.otpSubtitle}</p>
               </div>
             ) : (
               <div>
-                <label className="block text-sm font-medium text-gray-300 mb-1">{dict.password}</label>
+                <label className="block text-sm font-medium text-gray-300 mb-1 font-mono">{dict.password}</label>
                 <input
                   type="password"
                   required={mode === "signup" || authMethod !== "otp"}
                   minLength={6}
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  className="w-full px-4 py-2.5 rounded-lg bg-gray-800 border border-gray-700 text-white focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                  className="w-full px-4 py-2.5 rounded-md bg-[#0d121b] border border-[#232b3a] text-white focus:outline-none focus:ring-2 focus:ring-amber-500 font-mono"
                   placeholder={dict.passHint}
                 />
               </div>
@@ -252,36 +257,36 @@ export default function LoginForm({
 
             {message && (
               <div
-                className={`text-sm px-4 py-3 rounded-lg ${
+                className={`text-sm px-4 py-3 rounded-md font-mono ${
                   message.type === "error"
-                    ? "bg-red-900/50 text-red-300 border border-red-800"
-                    : "bg-emerald-900/50 text-emerald-300 border border-emerald-800"
+                    ? "bg-red-950/50 text-red-300 border border-red-900"
+                    : "bg-emerald-950/40 text-emerald-300 border border-emerald-900"
                 }`}
               >
-                {message.text}
+                {message.type === "error" ? "✗ " : "✓ "}{message.text}
               </div>
             )}
 
             <button
               type="submit"
               disabled={loading}
-              className="w-full py-2.5 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white font-semibold transition disabled:opacity-50"
+              className="w-full py-2.5 rounded-md btn-accent font-mono transition disabled:opacity-50"
             >
               {loading
-                ? dict.processing
+                ? "…" + dict.processing
                 : authMethod === "otp" && mode === "login"
                   ? otpSent
                     ? dict.otpVerify
                     : dict.otpSend
                   : mode === "login"
-                    ? dict.login
-                    : dict.signup}
+                    ? "$ " + dict.login
+                    : "$ " + dict.signup}
             </button>
           </div>
         </form>
         </div>
 
-        <p className="text-center text-gray-500 mt-6 text-sm">
+        <p className="text-center text-gray-500 mt-6 text-sm font-mono">
           {mode === "login" && (
             <button
               onClick={() => {
@@ -290,7 +295,7 @@ export default function LoginForm({
                 setOtpCode("");
                 setMessage(null);
               }}
-              className="text-emerald-400 hover:underline mb-3 block mx-auto"
+              className="text-amber-400 hover:underline mb-3 block mx-auto"
             >
               {authMethod === "otp" ? dict.passwordSwitch : dict.otpSwitch}
             </button>
@@ -298,14 +303,14 @@ export default function LoginForm({
           {mode === "login" ? (
             <>
               {dict.noAccount}{" "}
-              <button onClick={() => setMode("signup")} className="text-emerald-400 hover:underline">
+              <button onClick={() => setMode("signup")} className="text-amber-400 hover:underline">
                 {dict.freeSignup}
               </button>
             </>
           ) : (
             <>
               {dict.haveAccount}{" "}
-              <button onClick={() => setMode("login")} className="text-emerald-400 hover:underline">
+              <button onClick={() => setMode("login")} className="text-amber-400 hover:underline">
                 {dict.goLogin}
               </button>
             </>
